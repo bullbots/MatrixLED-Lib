@@ -5,9 +5,9 @@
     "frcYear": "2025",
     "uuid": "a282b64a-cb76-47b9-b562-715d67a5b716",
     "mavenUrls": [
-        "ThisNeedsToBeTheRootMavenUrl"
+        "https://bullbots.github.io/MatrixLED-Lib/matrixledlib/repos"
     ],
-    "jsonUrl": "InsertSomeUrlHere",
+    "jsonUrl": "https://bullbots.github.io/MatrixLED-Lib/matrixledlib/matrixledlib.json",
     "javaDependencies": [
         {
             "groupId": "${groupId}",
