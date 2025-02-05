@@ -3,11 +3,12 @@
   <groupId>matrixledlib</groupId>
   <artifactId>MATRIX_LED-cpp</artifactId>
   <versioning>
-    <latest>test</latest>
-    <release>test</release>
+    <latest>1.0.0</latest>
+    <release>1.0.0</release>
     <versions>
       <version>test</version>
+      <version>1.0.0</version>
     </versions>
-    <lastUpdated>20250205023637</lastUpdated>
+    <lastUpdated>20250205040532</lastUpdated>
   </versioning>
 </metadata>
