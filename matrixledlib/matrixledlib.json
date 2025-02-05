@@ -1,0 +1,20 @@
+{
+    "fileName": "matrixledlib.json",
+    "name": "MATRIX_LED",
+    "version": "test",
+    "frcYear": "2025",
+    "uuid": "a282b64a-cb76-47b9-b562-715d67a5b716",
+    "mavenUrls": [
+        "ThisNeedsToBeTheRootMavenUrl"
+    ],
+    "jsonUrl": "InsertSomeUrlHere",
+    "javaDependencies": [
+        {
+            "groupId": "matrixledlib",
+            "artifactId": "MATRIX_LED-java",
+            "version": "test"
+        }
+    ],
+    "jniDependencies": [],
+    "cppDependencies": []
+}

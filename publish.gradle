@@ -1,13 +1,10 @@
-import org.apache.tools.ant.filters.FixCrLfFilter
-import org.apache.tools.ant.filters.ReplaceTokens
-
 apply plugin: 'maven-publish'
 
 ext.licenseFile = files("$rootDir/LICENSE.txt")
 
-def templateVendorFile = "ExampleVendorJson.json"
+def pubVersion = System.getenv("releaseVersion") ?: "test"
 
-def pubVersion = '0.0.1'
+def releasesRepoUrl = "matrixledlib/repos/"
 
 def outputsFolder = file("$buildDir/outputs")
 
@@ -47,11 +44,10 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archiveFile
 }
 
-def artifactGroupId = 'com.vendor.frc'
-def baseArtifactId = 'Vendor'
-def driverZipBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}-driver_CLS"
-def zipBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}-cpp_CLS"
-def javaBaseName = "_GROUP_com_vendor_frc_ID_${baseArtifactId}-java_CLS"
+def artifactGroupId = 'matrixledlib'
+def baseArtifactId = 'MATRIX_LED'
+def zipBaseName = "_GROUP_matrixledlib_ID_${baseArtifactId}-cpp_CLS"
+def javaBaseName = "_GROUP_matrixledlib_ID_${baseArtifactId}-java_CLS"
 
 task cppHeadersZip(type: Zip) {
     destinationDirectory = outputsFolder
@@ -81,26 +77,10 @@ task cppSourceZip(type: Zip) {
     }
 }
 
-task cppDriverHeadersZip(type: Zip) {
-    destinationDirectory = outputsFolder
-    archiveBaseName = driverZipBaseName
-    archiveClassifier = "headers"
-
-    from(licenseFile) {
-        into '/'
-    }
-
-    from('src/main/driver/include') {
-        into '/'
-    }
-}
-
 build.dependsOn cppHeadersZip
 addTaskToCopyAllOutputs(cppHeadersZip)
 build.dependsOn cppSourceZip
 addTaskToCopyAllOutputs(cppSourceZip)
-build.dependsOn cppDriverHeadersZip
-addTaskToCopyAllOutputs(cppDriverHeadersZip)
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier = 'sources'
@@ -137,26 +117,18 @@ task outputJavadocJar(type: Jar, dependsOn: javadoc) {
 task vendordepJson() {
     description = 'Builds the vendordep json file.'
     group = 'Build'
-    outputs.file("$buildDir/repos/$templateVendorFile")
+//    outputs.file("$buildDir/repos/$templateVendorFile")
+    outputs.file("matrixledlib/matrixledlib.json")
 
     copy {
-        from templateVendorFile
-        into "$buildDir/repos/"
+        from "matrixledlib.json"
+        into "matrixledlib/"
         expand(version: pubVersion,
                 groupId: artifactGroupId,
                 artifactId: baseArtifactId)
     }
 }
 
-task vendordepJsonZip(type: Zip) {
-    destinationDirectory = outputsFolder
-    archiveBaseName = "vendordepJson"
-
-    from("$buildDir/repos/$templateVendorFile") {
-        into '/'
-    }
-    dependsOn vendordepJson
-}
 
 artifacts {
     archives sourcesJar
@@ -169,16 +141,13 @@ artifacts {
 addTaskToCopyAllOutputs(outputSourcesJar)
 addTaskToCopyAllOutputs(outputJavadocJar)
 addTaskToCopyAllOutputs(outputJar)
-addTaskToCopyAllOutputs(vendordepJsonZip)
 
 build.dependsOn outputSourcesJar
 build.dependsOn outputJavadocJar
 build.dependsOn outputJar
-build.dependsOn vendordepJsonZip
 
 libraryBuild.dependsOn build
 
-def releasesRepoUrl = "$buildDir/repos/releases"
 
 publishing {
     repositories {
@@ -189,17 +158,9 @@ publishing {
     }
 }
 
-task cleanReleaseRepo(type: Delete) {
-    delete releasesRepoUrl
-}
-
-tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
-
 model {
     publishing {
-        def taskList = createComponentZipTasks($.components, ['Vendor'], zipBaseName, Zip, project, includeStandardZipFormat)
-
-        def driverTaskList = createComponentZipTasks($.components, ['VendorDriver'], driverZipBaseName, Zip, project, includeStandardZipFormat)
+        def taskList = createComponentZipTasks($.components, ['MATRIX_LED'], zipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {
@@ -213,16 +174,6 @@ model {
                 groupId artifactGroupId
                 version pubVersion
             }
-            driver(MavenPublication) {
-                driverTaskList.each {
-                    artifact it
-                }
-                artifact cppDriverHeadersZip
-
-                artifactId = "${baseArtifactId}-driver"
-                groupId artifactGroupId
-                version pubVersion
-            }
 
             java(MavenPublication) {
                 artifact jar
@@ -230,14 +181,6 @@ model {
                 artifact javadocJar
 
                 artifactId = "${baseArtifactId}-java"
-                groupId artifactGroupId
-                version pubVersion
-            }
-
-            vendordep(MavenPublication) {
-                artifact vendordepJsonZip
-
-                artifactId = "${baseArtifactId}-vendordep"
                 groupId artifactGroupId
                 version pubVersion
             }
