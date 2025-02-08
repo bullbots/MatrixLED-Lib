@@ -10,7 +10,6 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -173,7 +172,7 @@ public class YamlLoader {
 
     private static void loadVideoYaml(Path filePath) {
         try {
-            Yaml yaml = new Yaml(new Constructor(ArrayList.class));
+            Yaml yaml = new Yaml();
             InputStream inputStream = null;
             try {
                 inputStream = new FileInputStream(filePath.toFile());
