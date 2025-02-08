@@ -16,6 +16,8 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /** Add your docs here. */
 public class YamlLoader {
@@ -23,23 +25,39 @@ public class YamlLoader {
 
     private static final List<String> filenames = Collections.synchronizedList(new ArrayList<>());
     private static final Map<String, Mat> images = Collections.synchronizedMap(new HashMap<>());
-    private static final Map<String, List<Mat>> videos = Collections.synchronizedMap(new HashMap<>());
+//    private static final Map<String, List<Mat>> videos = Collections.synchronizedMap(new HashMap<>());
+    private static final HashMap<String, List<Mat>> videos = new HashMap<>();
+    private static final ReentrantLock lock = new ReentrantLock();
 
     public static void load() {
-        long startTime = System.currentTimeMillis();
-        File[] files = Paths.get(Filesystem.getDeployDirectory().toString(), "").toFile().listFiles();
-        ArrayList<String> f = new ArrayList<>();
-        for (File file : files) {
-            if (file.getName().endsWith(".yaml")) {
-                filenames.add(file.getName());
-                
-                System.out.printf("Info: found file: %s\n",  file.getName());
-            }
-        }
+        Thread thread = new Thread(() -> {
+            long startTime = System.currentTimeMillis();
+            try {
+                lock.lock();
+                try {
+                    Thread.sleep(8000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                File[] files = Paths.get(Filesystem.getDeployDirectory().toString(), "matrixled").toFile().listFiles();
+                ArrayList<String> f = new ArrayList<>();
+                for (File file : files) {
+                    if (file.getName().endsWith(".yaml")) {
+                        filenames.add(file.getName());
 
-        loadMatImages();
-        loadYamlFiles();
-        System.out.printf("Info: YamlLoader loaded files in %.04f seconds.\n", (System.currentTimeMillis() - startTime) / 1000.);
+                        System.out.printf("Info: found file: %s\n", file.getName());
+                    }
+                }
+
+                loadMatImages();
+                loadYamlFiles();
+                System.out.printf("Info: YamlLoader loaded files in %.04f seconds.\n", (System.currentTimeMillis() - startTime) / 1000.);
+            } finally {
+                lock.unlock();
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     // static {
@@ -95,11 +113,15 @@ public class YamlLoader {
     }
 
     public static List<Mat> getVideo(String key) {
-        if (videos.containsKey(key))  {
-            return videos.get(key);
+        if (lock.tryLock()) {
+            try {
+                return videos.getOrDefault(key, null);
+            } finally {
+                lock.unlock();
+            }
+        } else {
+            return null;
         }
-
-        return null;
 
         // // Make sure the sad face loaded too.
         // List<Mat> ret = videos.get("sad-face-frown-one-frame");
@@ -181,7 +203,7 @@ public class YamlLoader {
     }
 
     private static void loadYamlFiles() {
-        Path deployPath = Filesystem.getDeployDirectory().toPath();
+        Path deployPath = Paths.get(Filesystem.getDeployDirectory().toString(), "matrixled");
 
         for (String filename : filenames) {
             Path filePath = deployPath.resolve(filename);

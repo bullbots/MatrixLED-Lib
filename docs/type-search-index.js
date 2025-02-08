@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"matrixledlib","l":"MatrixLEDs"},{"p":"matrixledlib","l":"YamlLoader"}];updateSearchResults();
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"matrixledlib","l":"MatrixLEDs"},{"p":"matrixledlib","l":"RunMatrixImageCommand"},{"p":"matrixledlib","l":"RunMatrixVideoCommand"},{"p":"matrixledlib","l":"RunMatrixVideoCommand.RunType"},{"p":"matrixledlib","l":"YamlLoader"}];updateSearchResults();
