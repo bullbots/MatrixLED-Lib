@@ -11,13 +11,6 @@ import org.opencv.core.Scalar;
 import java.util.Arrays;
 
 public class MatrixLEDs extends SubsystemBase {
-//  private static MatrixLEDs instance;
-//  public static MatrixLEDs getInstance() {
-//    if (instance == null) {
-//      instance = new MatrixLEDs(0, 2);
-//    }
-//    return instance;
-//  }
 
   private final AddressableLED led;
   private final AddressableLEDBuffer ledBuffer;

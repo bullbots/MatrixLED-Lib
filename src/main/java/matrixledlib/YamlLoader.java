@@ -33,11 +33,6 @@ public class YamlLoader {
             long startTime = System.currentTimeMillis();
             try {
                 lock.lock();
-                try {
-                    Thread.sleep(8000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
                 File[] files = Paths.get(Filesystem.getDeployDirectory().toString(), "matrixled").toFile().listFiles();
                 ArrayList<String> f = new ArrayList<>();
                 for (File file : files) {
